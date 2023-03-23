@@ -168,7 +168,7 @@ def process_file(args):
     html = preprocess(html)
     root = pq(html)
     # 标签到待翻译文本
-    elems = root('p, h1, h2, h3, h4, h5, h6, blockquote, td, th, li')
+    elems = root('p, h1, h2, h3, h4, h5, h6, blockquote, figcaption, td, th, li')
     elems = pq([
         e for e in elems 
         if not pq(e).children('p') and
