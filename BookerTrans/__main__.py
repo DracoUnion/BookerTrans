@@ -225,7 +225,6 @@ def main():
     parser.add_argument('site', help='translate api', choices=apis.keys())
     parser.add_argument('fname', help="html file name or dir name")
     parser.add_argument('-v', '--version', action="version", version=__version__)
-    parser.add_argument('-H', '--host', default='translate.google.cn', help="host for google translator")
     parser.add_argument('-P', '--proxy', help=f'proxy with format \d+\.\d+\.\d+\.\d+:\d+ or empty')
     parser.add_argument('-T', '--timeout', type=float, help=f'timeout in second')
     parser.add_argument('-t', '--threads', type=int, default=8, help=f'num of threads')
