@@ -3,12 +3,20 @@ import os
 
 class ChatGptApi():
     def __init__(self):
-        self.key = os.environ.get('OPENAI_API_KEY', '')
+        self.key = None
         self.prompt = '请把以下文本翻译成中文，不要保留原文：'
         self.retry = 10
         self.temperature = 0.5
         self.max_tokens = 4000
         self.model = 'text-davinci-003'
+        
+    def _get_api_key(self):
+        return self._key
+        
+    def _set_api_key(self, key)
+        self._key = key or os.environ.get('OPENAI_API_KEY', '')
+        
+    key = property(_get_api_key, _set_api_key)
         
     def _get_proxy(self):
         return openai.proxy

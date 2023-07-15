@@ -214,6 +214,7 @@ def load_api(args):
     api = apis[args.site]()
     api.proxy = args.proxy
     api.timeout = args.timeout
+    api.key = args.api_key
     return api
 
 def main():
@@ -223,7 +224,8 @@ def main():
     parser.add_argument('site', help='translate api', choices=apis.keys())
     parser.add_argument('fname', help="html file name or dir name")
     parser.add_argument('-v', '--version', action="version", version=__version__)
-    parser.add_argument('-P', '--proxy', help=f'proxy with format \d+\.\d+\.\d+\.\d+:\d+ or empty')
+    parser.add_argument('-p', '--proxy', help=f'proxy with format \d+\.\d+\.\d+\.\d+:\d+ or empty')
+    parser.add_argument('-k', '--api-key', help=f'api key')
     parser.add_argument('-T', '--timeout', type=float, default=60, help=f'timeout in second')
     parser.add_argument('-t', '--threads', type=int, default=1, help=f'num of threads')
     parser.add_argument('-w', '--wait-sec', type=float, default=1.5, help='delay in second between two times of translation')
