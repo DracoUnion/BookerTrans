@@ -21,16 +21,16 @@ class ChatGptApi():
     def translate(text):
         ipt = self.prompt + text
         assert len(ipt) <= 3096
-        for i in range(self.retry):
-            try: 
-                r = openai.Completion.create(
-                    engine=self.model,
-                    prompt=ipt,
-                    max_tokens=self.max_tokens - len(ipt),
-                    temperature=self.temperature,
-                )
-                if hasattr(r, 'choices'): break
-                raise ValueError(f'OpenAI API 调用失败：{r}')
-            except Exception as ex: 
-                if i == self.retry - 1: raise ex
-        return r.choices[0].text
+        try: 
+            r = openai.Completion.create(
+                engine=self.model,
+                prompt=ipt,
+                max_tokens=self.max_tokens - len(ipt),
+                temperature=self.temperature,
+            )
+        except Exception as ex: 
+            raise ex
+        if hasattr(r, 'choices'): 
+            return r.choices[0].text
+        else
+            raise ValueError(f'OpenAI API 调用失败：{r}')

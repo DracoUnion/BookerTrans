@@ -95,13 +95,12 @@ def trans_one(args, htmls, i):
         trlocal.api = load_api(args)
     api = trlocal.api
     # 标签预处理
-    html, tokens = tags_preprocess(html)
+    # html, tokens = tags_preprocess(html)
     # 按句子翻译
     html = trans_real(api, html)
-    if not html: 
-        return
+    if not html: return
     # 标签还原
-    html = tags_recover(html, tokens)
+    # html = tags_recover(html, tokens)
     htmls[i] = html
 
 def preprocess(html):
@@ -213,7 +212,6 @@ def process_dir(args):
 
 def load_api(args):
     api = apis[args.site]()
-    api.host = args.host
     api.proxy = args.proxy
     api.timeout = args.timeout
     return api
@@ -226,13 +224,13 @@ def main():
     parser.add_argument('fname', help="html file name or dir name")
     parser.add_argument('-v', '--version', action="version", version=__version__)
     parser.add_argument('-P', '--proxy', help=f'proxy with format \d+\.\d+\.\d+\.\d+:\d+ or empty')
-    parser.add_argument('-T', '--timeout', type=float, help=f'timeout in second')
-    parser.add_argument('-t', '--threads', type=int, default=8, help=f'num of threads')
+    parser.add_argument('-T', '--timeout', type=float, default=60, help=f'timeout in second')
+    parser.add_argument('-t', '--threads', type=int, default=1, help=f'num of threads')
     parser.add_argument('-w', '--wait-sec', type=float, default=1.5, help='delay in second between two times of translation')
     parser.add_argument('-r', '--retry', type=int, default=10, help='count of retrying')
-    parser.add_argument('-s', '--src', default='auto', help='src language')
-    parser.add_argument('-d', '--dst', default='zh-CN', help='dest language')
-    parser.add_argument('-D', '--debug', action='store_true', help='debug mode')
+    # parser.add_argument('-s', '--src', default='auto', help='src language')
+    # parser.add_argument('-d', '--dst', default='zh-CN', help='dest language')
+    # parser.add_argument('-D', '--debug', action='store_true', help='debug mode')
     parser.add_argument('-l', "--limit", type=int, default=3000, help='word count limit')
     args = parser.parse_args()
     
@@ -242,9 +240,6 @@ def main():
     
     config['wait_sec'] = args.wait_sec
     config['retry'] = args.retry
-    config['src'] = args.src
-    config['dst'] = args.dst
-    config['debug'] = args.debug
     pool = ThreadPoolExecutor(args.threads)
     
     if path.isdir(args.fname):
