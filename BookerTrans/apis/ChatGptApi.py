@@ -26,7 +26,7 @@ class ChatGptApi():
         
     proxy = property(_get_proxy, _set_proxy)
         
-    def translate(self, text):
+    def translate(self, text, src='', dst=''):
         ipt = self.prompt + text
         assert len(ipt) <= 3096
         try: 
