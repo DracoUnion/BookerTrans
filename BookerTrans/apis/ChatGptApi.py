@@ -13,7 +13,7 @@ class ChatGptApi():
     def _get_api_key(self):
         return self._key
         
-    def _set_api_key(self, key)
+    def _set_api_key(self, key):
         self._key = key or os.environ.get('OPENAI_API_KEY', '')
         
     key = property(_get_api_key, _set_api_key)
@@ -21,12 +21,12 @@ class ChatGptApi():
     def _get_proxy(self):
         return openai.proxy
         
-    def _set_proxy(self, pr)
+    def _set_proxy(self, pr):
         openai.proxy = pr
         
     proxy = property(_get_proxy, _set_proxy)
         
-    def translate(text):
+    def translate(self, text):
         ipt = self.prompt + text
         assert len(ipt) <= 3096
         try: 
@@ -40,5 +40,5 @@ class ChatGptApi():
             raise ex
         if hasattr(r, 'choices'): 
             return r.choices[0].text
-        else
+        else:
             raise ValueError(f'OpenAI API 调用失败：{r}')
