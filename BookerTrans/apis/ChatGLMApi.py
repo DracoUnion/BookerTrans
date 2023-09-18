@@ -2,7 +2,7 @@ from ..util import *
 import re
 import subprocess as subp
 
-class ChatGlmApi():
+class ChatGLMApi():
 
     def __init__(self, args):
         self.glm_path = find_cmd_path('chatglm')
