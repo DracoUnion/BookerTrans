@@ -12,7 +12,6 @@ from functools import reduce
 from concurrent.futures import ThreadPoolExecutor
 from . import __version__
 from .apis import apis
-from .config import config
 from .util import *
 
 RE_CODE = r'<(pre|code|tt|var|kbd)[^>]*?>[\s\S]*?</\1>'
@@ -66,17 +65,13 @@ def trans_real(api, src):
     for i in range(config['retry']):
         try:
             print(src)
-            dst = api.translate(
-                src, 
-                src=config['src'], 
-                dst=config['dst'],
-            )
+            dst = api.translate(src)
             print(dst)
-            time.sleep(config['wait_sec'])
+            # time.sleep(config['wait_sec'])
             if dst: break
         except Exception as ex:
             traceback.print_exc()
-            time.sleep(config['wait_sec'])
+            # time.sleep(config['wait_sec'])
     
     if not dst: return None
     
@@ -225,6 +220,7 @@ def main():
     parser.add_argument('-w', '--wait-sec', type=float, default=1.5, help='delay in second between two times of translation')
     parser.add_argument('-r', '--retry', type=int, default=10, help='count of retrying')
     parser.add_argument('-l', "--limit", type=int, default=4000, help='word count limit')
+    parser.add_argument('-P', "--prompt", default=default_prompt, help='prompt for traslation')
     args = parser.parse_args()
     
     if args.proxy:
