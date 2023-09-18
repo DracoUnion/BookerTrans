@@ -3,6 +3,8 @@ import sys
 import os
 from os import path
 
+default_prompt = '请把以下文本翻译成中文，不要保留原文：'
+
 is_html = lambda f: f.endswith('.html') or \
                     f.endswith('.htm') or \
                     f.endswith('.xhtml')

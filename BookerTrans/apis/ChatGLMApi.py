@@ -3,18 +3,18 @@ import re
 import subprocess as subp
 
 class ChatGlmApi():
-    prompt = '请把以下文本翻译成中文，不要保留原文：'
 
     def __init__(self, args):
-        
         self.glm_path = find_cmd_path('chatglm')
         if not self.glm_path:
             raise RuntimeError('未找到 chatglm.cpp，请下载并将目录添加到 $PATH')
         self.model_path = args.model
         if re.search(r'^[\w\-]+$', self.model_path):
             self.model_path = path.join(self.glm_path, 'models', self.model_path + '.bin')
+        self.prompt = args.prompt
 
     def translate(self, text, src='', dst=''):
+        assert len(text) <= 4096 - len(self.prompt)
         cmd = [
             'chatglm', '-m', self.model_path,
             '-p', self.prompt + text,

@@ -3,12 +3,12 @@ import os
 
 class ChatGptApi():
     def __init__(self, args):
-        self.key = None
-        self.prompt = '请把以下文本翻译成中文，不要保留原文：'
+        self.key = args.key or os.environ.get('OPENAI_API_KEY', '')
+        self.prompt = args.prompt
         self.retry = 10
         self.temperature = 0.5
         self.max_tokens = 4000
-        self.model = 'text-davinci-003'
+        self.model = args.model or 'text-davinci-003'
         
     def _get_api_key(self):
         return self._key
