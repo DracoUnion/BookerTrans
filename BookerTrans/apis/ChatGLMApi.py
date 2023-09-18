@@ -26,7 +26,7 @@ class ChatGLMApi():
             stdout=subp.PIPE, 
             stderr=subp.PIPE,
             shell=True,
-        ).communicate()[0].decode('utf8')
+        ).communicate()[0].decode('utf8').strip()
         if not res:
             raise('chatglm 调用失败，未返回任务内容')
         return res
