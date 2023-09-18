@@ -2,7 +2,7 @@ import openai
 import os
 
 class ChatGptApi():
-    def __init__(self):
+    def __init__(self, args):
         self.key = None
         self.prompt = '请把以下文本翻译成中文，不要保留原文：'
         self.retry = 10
