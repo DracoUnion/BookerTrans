@@ -15,7 +15,7 @@ class ChatGlmApi():
         self.limit = args.limit
 
     def translate(self, text, src='', dst=''):
-        assert len(text) <= args.limit - len(self.prompt)
+        assert len(text) <= self.limit - len(self.prompt)
         cmd = [
             'chatglm', '-m', self.model_path,
             '-p', self.prompt + text,
