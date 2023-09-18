@@ -12,9 +12,10 @@ class ChatGlmApi():
         if re.search(r'^[\w\-]+$', self.model_path):
             self.model_path = path.join(self.glm_path, 'models', self.model_path + '.bin')
         self.prompt = args.prompt
+        self.limit = args.limit
 
     def translate(self, text, src='', dst=''):
-        assert len(text) <= 4096 - len(self.prompt)
+        assert len(text) <= args.limit - len(self.prompt)
         cmd = [
             'chatglm', '-m', self.model_path,
             '-p', self.prompt + text,

@@ -92,7 +92,7 @@ def trans_one(args, htmls, i):
         return
     # 初始化 API
     if not hasattr(trlocal, 'api'):
-        trlocal.api = load_api(args)
+        trlocal.api = apis[args.site](args)
     api = trlocal.api
     # 标签预处理
     # html, tokens = tags_preprocess(html)
@@ -210,38 +210,27 @@ def process_dir(args):
         # hdls.append(h)
     # for h in hdls: h.result()
 
-def load_api(args):
-    api = apis[args.site]()
-    api.proxy = args.proxy
-    api.timeout = args.timeout
-    api.key = args.api_key
-    return api
-
 def main():
     global pool
     
     parser = ArgumentParser(prog="BookerTrans", description="HTML Translator with Google Api for iBooker/ApacheCN")
-    parser.add_argument('site', help='translate api', choices=apis.keys())
+    parser.add_argument('api', help='translate api', choices=apis.keys())
     parser.add_argument('fname', help="html file name or dir name")
     parser.add_argument('-v', '--version', action="version", version=__version__)
     parser.add_argument('-p', '--proxy', help=f'proxy with format \d+\.\d+\.\d+\.\d+:\d+ or empty')
     parser.add_argument('-k', '--api-key', help=f'api key')
+    parser.add_argument('-m', '--model', help=f'model name')
     parser.add_argument('-T', '--timeout', type=float, default=60, help=f'timeout in second')
     parser.add_argument('-t', '--threads', type=int, default=1, help=f'num of threads')
     parser.add_argument('-w', '--wait-sec', type=float, default=1.5, help='delay in second between two times of translation')
     parser.add_argument('-r', '--retry', type=int, default=10, help='count of retrying')
-    # parser.add_argument('-s', '--src', default='auto', help='src language')
-    # parser.add_argument('-d', '--dst', default='zh-CN', help='dest language')
-    # parser.add_argument('-D', '--debug', action='store_true', help='debug mode')
-    parser.add_argument('-l', "--limit", type=int, default=3000, help='word count limit')
+    parser.add_argument('-l', "--limit", type=int, default=4000, help='word count limit')
     args = parser.parse_args()
     
     if args.proxy:
         p = args.proxy
         args.proxy = {'http': p, 'https': p}
-    
-    config['wait_sec'] = args.wait_sec
-    config['retry'] = args.retry
+
     pool = ThreadPoolExecutor(args.threads)
     
     if path.isdir(args.fname):

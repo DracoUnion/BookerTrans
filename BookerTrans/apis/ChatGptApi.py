@@ -3,11 +3,11 @@ import os
 
 class ChatGptApi():
     def __init__(self, args):
-        self.key = args.key or os.environ.get('OPENAI_API_KEY', '')
+        self.key = args.api_key or os.environ.get('OPENAI_API_KEY', '')
         self.prompt = args.prompt
-        self.retry = 10
+        self.retry = args.retry
         self.temperature = 0.5
-        self.max_tokens = 4000
+        self.limit = args.limit
         self.model = args.model or 'text-davinci-003'
         
     def _get_api_key(self):
@@ -28,12 +28,12 @@ class ChatGptApi():
         
     def translate(self, text, src='', dst=''):
         ipt = self.prompt + text
-        assert len(ipt) <= 3096
+        assert len(ipt) <= self.limit
         try: 
             r = openai.Completion.create(
                 engine=self.model,
                 prompt=ipt,
-                max_tokens=self.max_tokens - len(ipt),
+                max_tokens=self.limit - len(ipt),
                 temperature=self.temperature,
             )
         except Exception as ex: 
