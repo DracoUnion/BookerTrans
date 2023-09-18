@@ -8,7 +8,7 @@ class ChatGLMApi():
         self.glm_path = find_cmd_path('chatglm')
         if not self.glm_path:
             raise RuntimeError('未找到 chatglm.cpp，请下载并将目录添加到 $PATH')
-        self.model_path = args.model
+        self.model_path = args.model or 'chatglm2-ggml-6b-q4_0'
         if re.search(r'^[\w\-]+$', self.model_path):
             self.model_path = path.join(self.glm_path, 'models', self.model_path + '.bin')
         self.prompt = args.prompt
