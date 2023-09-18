@@ -59,10 +59,10 @@ def tags_recover(html, tags):
         
     return html
 
-def trans_real(api, src):
+def trans_real(args, api, src):
 
     dst = None
-    for i in range(config['retry']):
+    for i in range(args.retry):
         try:
             print(src)
             dst = api.translate(src)
@@ -92,7 +92,7 @@ def trans_one(args, htmls, i):
     # 标签预处理
     # html, tokens = tags_preprocess(html)
     # 按句子翻译
-    html = trans_real(api, html)
+    html = trans_real(args, api, html)
     if not html: return
     # 标签还原
     # html = tags_recover(html, tokens)
