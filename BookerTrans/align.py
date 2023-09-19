@@ -72,8 +72,7 @@ def parse_block(line):
 
 def md2blocks(md):
     lines = md.replace('\t', '\x20' * 4).split('\n')
-    lines = [l.strip() for l in lines]
-    lines = list(filter(None, lines))
+    lines = [l for l in lines if l.strip()]
     
     res = [parse_block(l) for l in lines]
     return res
@@ -82,39 +81,48 @@ def match_block(b1, b2):
     return b1['prefs'] == b2['prefs'] and \
            b1['type'] == b2['type']
     
-def find_next_pref(r, st, b):
-    for i in range(st, len(r)):
-        if match_block(r[i], b):
+def find_next_match(bls, b, st=0):
+    for i in range(st, len(bls)):
+        if match_block(bls[i], b):
             return i
     return len(r)
     
-def make_align(md1, md2):
-    r1, r2 = md2blocks(md1), md2blocks(md2)
+def make_align_md(md1, md2, prop1='en', prop2='zh'):
+    bls1, bls2 = md2blocks(md1), md2blocks(md2)
+    for b1 in bls1:
+        b1[prop1] = b1['line']
+        del b1['line']
+    for b2 in bls2:
+        b2[prop2] = b21['line']
+        del b2['line']
+    return make_align(bls1, bls2, prop1, prop2)
+    
+def make_align(bls1, bls2, prop1='en', prop2='zh'):
     idx1, idx2 = 0, 0
     res = []
-    while idx1 < len(r1) and idx2 < len(r2):
-        b1, b2 = r1[idx1], r2[idx2]
+    while idx1 < len(bls1) and idx2 < len(bls2):
+        b1, b2 = bls1[idx1], bls2[idx2]
         if match_block(b1, b2):
             res.append(b1 | b2)
             idx1 += 1
             idx2 += 1
             continue
-        idx1n = find_next_pref(r1, idx1 + 1, b2)
-        idx2n = find_next_pref(r2, idx2 + 1, b1)
+        idx1n = find_next_match(bls1, b2, idx1 + 1)
+        idx2n = find_next_match(bls2, b1, idx2 + 1)
         if idx1n - idx1 < idx2n - idx2:
             while idx1 < idx1n:
-                res.append(r1['idx1'] | {'zh': ''})
+                res.append(bls1['idx1'] | {prop2: ''})
                 idx1 += 1
         else:
             while idx2 < idx2n:
-                res.append(r2[idx2] | {'en': ''})
+                res.append(bls2[idx2] | {prop1: ''})
                 idx2 += 1
             
-    while idx1 < len(r1):
-        res.append(r1['idx1'] | {'zh': ''})
+    while idx1 < len(bls1):
+        res.append(bls1['idx1'] | {prop2: ''})
         idx1 += 1
-    while idx2 < len(r2):
-        res.append(r2[idx2] | {'en': ''})
+    while idx2 < len(bls2):
+        res.append(bls2[idx2] | {prop1: ''})
         idx2 += 1
     return res
     
