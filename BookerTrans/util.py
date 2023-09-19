@@ -1,7 +1,10 @@
 import traceback
 import sys
 import os
+import re
 from os import path
+
+RE_MD_PRE = r'^(\x20*)(`+)([\s\S]+?)^\1\2'
 
 default_prompt = '请把以下文本翻译成中文，不要保留原文：'
 
@@ -30,3 +33,18 @@ def find_cmd_path(name):
         if any(path.isfile(path.join(p, name + s)) for s in suff):
             return p
     return ''
+    
+def ext_md_pre(md):
+    pres = []
+    def replace_func(g):
+        pre = g.group(2) + g.group(3) + g.group(1) + g.group(2)
+        pres.append(pre)
+        rep = g.group(1) + f'[PRE{len(pres)-1}]'
+        return rep
+    md = re.sub(RE_MD_PRE, replace_func, md, flags=re.M)
+    return md, pres
+
+def rec_md_pre(md, pres):
+    for i, pre in enumerate(pres):
+        md = md.replace(f'[PRE{i}]', pre)
+    return md

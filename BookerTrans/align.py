@@ -3,6 +3,7 @@ from os import path
 import yaml
 import json
 import os
+from .util import *
 
 PREF_IND = r'\x20{2}'
 PREF_OL = r'\d+\.\x20{2}'
@@ -71,11 +72,18 @@ def parse_block(line, prop='line'):
     }
 
 def md2blocks(md, prop='line'):
-    lines = md.replace('\t', '\x20' * 4).split('\n')
+    md = md.replace('\t', '\x20' * 4)
+    md, pres = ext_md_pres(md)
+    lines = md.split('\n')
     lines = [l for l in lines if l.strip()]
     
-    res = [parse_block(l, prop) for l in lines]
-    return res
+    bls = [parse_block(l, prop) for l in lines]
+    for b in bls:
+        if not b['type'] == TYPE_PRE:
+            continue
+        idx = int(b[prop][4:-1])
+        b['pre'] = pres[idx]
+    return bls
     
 def match_block(b1, b2):
     return b1['prefs'] == b2['prefs'] and \
