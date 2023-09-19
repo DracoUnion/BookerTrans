@@ -57,7 +57,7 @@ def match_type(line):
     return 'TYPE_NORMAL'
         
 
-def parse_block(line):
+def parse_block(line, prop='line'):
     prefs = []
     while True:
         pref, line = match_one_pref(line)
@@ -66,15 +66,15 @@ def parse_block(line):
     line = line.strip()
     return {
         'prefs': prefs,
-        'line': line,
+        prop: line,
         'type': match_type(line)
     }
 
-def md2blocks(md):
+def md2blocks(md, prop='line'):
     lines = md.replace('\t', '\x20' * 4).split('\n')
     lines = [l for l in lines if l.strip()]
     
-    res = [parse_block(l) for l in lines]
+    res = [parse_block(l, prop) for l in lines]
     return res
     
 def match_block(b1, b2):
@@ -88,13 +88,7 @@ def find_next_match(bls, b, st=0):
     return len(r)
     
 def make_align_md(md1, md2, prop1='en', prop2='zh'):
-    bls1, bls2 = md2blocks(md1), md2blocks(md2)
-    for b1 in bls1:
-        b1[prop1] = b1['line']
-        del b1['line']
-    for b2 in bls2:
-        b2[prop2] = b21['line']
-        del b2['line']
+    bls1, bls2 = md2blocks(md1, prop1), md2blocks(md2, prop2)
     return make_align(bls1, bls2, prop1, prop2)
     
 def make_align(bls1, bls2, prop1='en', prop2='zh'):
