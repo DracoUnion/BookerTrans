@@ -4,9 +4,9 @@ import yaml
 import json
 import os
 
-PREF_IND = r'(\x20{4}|\t)'
+PREF_IND = r'\x20{2}'
 PREF_OL = r'\d+\.\x20{2}'
-PREF_UL = r'[\*\+\-]\x20{3}'
+PREF_UL = r'[\*\+\-]\x20'
 PREF_H1 = r'#\x20+'
 PREF_H2 = r'#{2}\x20+'
 PREF_H3 = r'#{3}\x20+'
@@ -57,7 +57,7 @@ def match_type(line):
     return 'TYPE_NORMAL'
         
 
-def ext_prefs(line):
+def parse_block(line):
     prefs = []
     while True:
         pref, line = match_one_pref(line)
@@ -70,74 +70,51 @@ def ext_prefs(line):
         'type': match_type(line)
     }
 
-def proc_md(md):
-    lines = md.split('\n')
+def md2blocks(md):
+    lines = md.replace('\t', '\x20' * 4).split('\n')
     lines = [l.strip() for l in lines]
     lines = list(filter(None, lines))
     
-    res = [ext_prefs(l) for l in lines]
+    res = [parse_block(l) for l in lines]
     return res
     
-def find_next_pref(r, st, p, t):
+def match_block(b1, b2):
+    return b1['prefs'] == b2['prefs'] and \
+           b1['type'] == b2['type']
+    
+def find_next_pref(r, st, b):
     for i in range(st, len(r)):
-        if r[i]['prefs'] == p and r[i]['type'] == t:
+        if match_block(r[i], b):
             return i
     return len(r)
     
 def make_align(md1, md2):
-    r1, r2 = proc_md(md1), proc_md(md2)
+    r1, r2 = md2blocks(md1), md2blocks(md2)
     idx1, idx2 = 0, 0
     res = []
     while idx1 < len(r1) and idx2 < len(r2):
-        l1, l2 = r1[idx1], r2[idx2]
-        p1, p2 = l1['prefs'], l2['prefs']
-        t1, t2 = l1['type'], l2['type']
-        if p1 == p2 and t1 == t2:
-            res.append({
-                'en': l1['line'],
-                'zh': l2['line'],
-                'prefs': p1,
-                'type': t1,
-            })
+        b1, b2 = r1[idx1], r2[idx2]
+        if match_block(b1, b2):
+            res.append(b1 | b2)
             idx1 += 1
             idx2 += 1
             continue
-        idx1n = find_next_pref(r1, idx1 + 1, p2, t2)
-        idx2n = find_next_pref(r2, idx2 + 1, p1, t1)
+        idx1n = find_next_pref(r1, idx1 + 1, b2)
+        idx2n = find_next_pref(r2, idx2 + 1, b1)
         if idx1n - idx1 < idx2n - idx2:
             while idx1 < idx1n:
-                res.append({
-                    'en': r1[idx1]['line'],
-                    'zh': '',
-                    'prefs': r1[idx1]['prefs'],
-                    'type': r1[idx1]['type'],
-                })
+                res.append(r1['idx1'] | {'zh': ''})
                 idx1 += 1
         else:
             while idx2 < idx2n:
-                res.append({
-                    'en': '',
-                    'zh': r2[idx2]['line'],
-                    'prefs': r2[idx2]['prefs'],
-                    'type': r2[idx2]['type'],
-                })
+                res.append(r2[idx2] | {'en': ''})
                 idx2 += 1
             
     while idx1 < len(r1):
-        res.append({
-            'en': r1[idx1]['line'],
-            'zh': '',
-            'prefs': r1[idx1]['prefs'],
-            'type': r1[idx1]['type'],
-        })
+        res.append(r1['idx1'] | {'zh': ''})
         idx1 += 1
     while idx2 < len(r2):
-        res.append({
-            'en': '',
-            'zh': r2[idx2]['line'],
-            'prefs': r2[idx2]['prefs'],
-            'type': r2[idx2]['type'],
-        })
+        res.append(r2[idx2] | {'en': ''})
         idx2 += 1
     return res
     
@@ -177,7 +154,7 @@ def make_totrans_handler(args):
     if not fname.endswith('.md'):
        raise ValueError('请提供 MD 文件！')
     md = open(fname, encoding='utf8').read()
-    res = proc_md(md)
+    res = md2blocks(md)
     res = [{
         'en': r['line'], 
         'prefs': r['prefs'],
