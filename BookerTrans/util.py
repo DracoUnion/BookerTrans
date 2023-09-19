@@ -4,7 +4,7 @@ import os
 import re
 from os import path
 
-RE_MD_PRE = r'^(\x20*)(`+)([\s\S]+?)^\1\2'
+RE_MD_PRE = r'^(\x20*)(`{3,})([\s\S]+?)^\1\2'
 
 default_prompt = '请把以下文本翻译成中文，不要保留原文：'
 
